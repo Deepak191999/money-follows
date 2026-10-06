@@ -1,0 +1,78 @@
+<form (ngSubmit)="submit()" class="stack">
+  <div class="row">
+    <label>
+      Amount (INR)
+      <input type="number" name="amount" min="0.01" step="0.01" required [(ngModel)]="amount" />
+    </label>
+    <label>
+      Category
+      <input type="text" name="category" required [(ngModel)]="category" />
+    </label>
+    <label>
+      Date
+      <input type="date" name="spentOn" required [(ngModel)]="spentOn" />
+    </label>
+  </div>
+  <label>
+    Description
+    <input type="text" name="description" required [(ngModel)]="description" />
+  </label>
+
+  @if (members().length) {
+    <label>
+      Split
+      <select name="splitType" [(ngModel)]="splitType">
+        <option value="equal">Equal</option>
+        <option value="exact">Exact amounts</option>
+        <option value="percent">Percentages</option>
+      </select>
+    </label>
+    <div class="splits">
+      @for (m of members(); track m.id) {
+        <label class="inline">
+          @switch (splitType) {
+            @case ('equal') {
+              <input
+                type="checkbox"
+                [name]="'inc' + m.id"
+                [checked]="isIncluded(m.id)"
+                (change)="toggle(m.id)"
+              />
+              {{ m.name }}
+            }
+            @case ('exact') {
+              {{ m.name }}
+              <input
+                type="number"
+                [name]="'share' + m.id"
+                min="0"
+                step="0.01"
+                placeholder="INR"
+                [(ngModel)]="shares[m.id]"
+              />
+            }
+            @case ('percent') {
+              {{ m.name }}
+              <input
+                type="number"
+                [name]="'share' + m.id"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="%"
+                [(ngModel)]="shares[m.id]"
+              />
+            }
+          }
+        </label>
+      }
+    </div>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+  <div>
+    <button type="submit" [disabled]="busy()">Add expense</button>
+  </div>
+</form>

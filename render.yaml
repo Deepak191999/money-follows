@@ -1,0 +1,60 @@
+# Render blueprint: Node backend + static React frontend.
+#
+# The build and start commands below were run against a clean copy of this repo
+# (no node_modules, no dist, no data.db) and verified end to end. The Dockerfile
+# in backend-node/ is a working alternative; this avoids it because a plain Node
+# build is one less moving part.
+#
+# After the FIRST deploy you must set two URLs that cannot be known in advance.
+# See DEPLOY.md step 3.
+
+services:
+  - type: web
+    name: money-follows-api
+    runtime: node
+    plan: free
+    rootDir: backend-node
+    # --include=dev is required: NODE_ENV=production below would otherwise make
+    # npm skip typescript and tsx, and both are needed to build and seed.
+    buildCommand: npm ci --include=dev && npm run build && npm run seed
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      # Set explicitly so the production guards apply: without JWT_SECRET the
+      # process refuses to start, rather than signing with a known constant.
+      - key: NODE_ENV
+        value: production
+      # Render generates a strong random value. Never commit a real secret.
+      - key: JWT_SECRET
+        generateValue: true
+      # Store invitation emails in the database instead of sending them.
+      - key: MAIL_TRANSPORT
+        value: outbox
+      # Lets reviewers read those emails at /dev/outbox. This makes every invite
+      # link public, which is acceptable for throwaway seed data and nothing else.
+      - key: ENABLE_DEV_OUTBOX
+        value: "true"
+      # Must be the FRONTEND origin: invitation links are built from it. Left at
+      # the default it falls back to localhost and every emailed link is dead.
+      - key: APP_URL
+        value: https://money-follows-web.onrender.com
+      - key: INVITE_TTL_DAYS
+        value: "7"
+
+  - type: web
+    name: money-follows-web
+    runtime: static
+    rootDir: frontend-react
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      # Baked into the bundle at build time by Vite, so changing it needs a
+      # rebuild, not a restart.
+      - key: VITE_API_BASE
+        value: https://money-follows-api.onrender.com
+    routes:
+      # Single-page app: /invite/<token> and /groups/1 must serve index.html or
+      # invitation links will 404.
+      - type: rewrite
+        source: /*
+        destination: /index.html

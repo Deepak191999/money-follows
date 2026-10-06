@@ -1,0 +1,21 @@
+services:
+  backend-node:
+    build: { context: ., dockerfile: backend-node/Dockerfile }
+    ports: ["8000:8000"]
+    environment:
+      JWT_SECRET: change-me
+    profiles: [node]
+  backend-fastapi:
+    build: { context: ., dockerfile: backend-fastapi/Dockerfile }
+    ports: ["8000:8000"]
+    environment:
+      JWT_SECRET: change-me
+    profiles: [fastapi]
+  frontend-angular:
+    build: ./frontend-angular
+    ports: ["4200:80"]
+    profiles: [angular]
+  frontend-react:
+    build: ./frontend-react
+    ports: ["5173:80"]
+    profiles: [react]

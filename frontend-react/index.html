@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Money Follows</title>
+    <script>
+      // Runs before first paint so a pinned theme does not flash the other one.
+      // Must stay in sync with THEME_KEY and applyTheme() in src/theme.tsx.
+      try {
+        var t = localStorage.getItem('theme')
+        if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t
+      } catch (e) {
+        /* storage blocked; fall back to the OS preference */
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

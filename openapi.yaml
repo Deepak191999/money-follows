@@ -1,0 +1,199 @@
+openapi: 3.1.0
+info:
+  title: Money Follows API
+  version: 0.1.0
+  description: Shared expense tracker. Both backends implement this contract on port 8000. Amounts are integer paise, currency INR.
+servers:
+  - url: http://localhost:8000
+security:
+  - bearer: []
+paths:
+  /health:
+    get:
+      security: []
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { type: object, properties: { status: { type: string } } } } } }
+  /auth/signup:
+    post:
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/Signup" } } } }
+      responses:
+        "201": { description: created, content: { application/json: { schema: { $ref: "#/components/schemas/AuthResponse" } } } }
+        "409": { $ref: "#/components/responses/Error" }
+  /auth/login:
+    post:
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/Login" } } } }
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: "#/components/schemas/AuthResponse" } } } }
+        "401": { $ref: "#/components/responses/Error" }
+  /me:
+    get:
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+  /groups:
+    get:
+      responses:
+        "200": { description: groups the caller belongs to, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Group" } } } } }
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [name], properties: { name: { type: string } } } } } }
+      responses:
+        "201": { description: created, content: { application/json: { schema: { $ref: "#/components/schemas/Group" } } } }
+  /groups/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: "#/components/schemas/GroupDetail" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+    patch:
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { name: { type: string } } } } } }
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: "#/components/schemas/Group" } } } }
+    delete:
+      responses:
+        "204": { description: deleted }
+  /groups/{id}/members:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [email], properties: { email: { type: string, format: email } } } } } }
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: "#/components/schemas/GroupDetail" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+  /groups/{id}/balances:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      responses:
+        "200":
+          description: net position per member. Positive = is owed, negative = owes.
+          content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Balance" } } } }
+  /groups/{id}/settle:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/SettleRequest" } } } }
+      responses:
+        "201": { description: created, content: { application/json: { schema: { $ref: "#/components/schemas/Settlement" } } } }
+  /expenses:
+    get:
+      parameters:
+        - { name: group_id, in: query, schema: { type: integer }, description: omit for personal expenses of the caller }
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Expense" } } } } }
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpenseCreate" } } } }
+      responses:
+        "201": { description: created, content: { application/json: { schema: { $ref: "#/components/schemas/Expense" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+  /expenses/search:
+    get:
+      parameters: [{ name: q, in: query, required: true, schema: { type: string } }]
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Expense" } } } } }
+  /expenses/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: "#/components/schemas/Expense" } } } }
+    patch:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpenseCreate" } } } }
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: "#/components/schemas/Expense" } } } }
+    delete:
+      responses:
+        "204": { description: deleted }
+  /dashboard/monthly:
+    get:
+      parameters: [{ name: month, in: query, required: true, schema: { type: string, pattern: "^\\d{4}-\\d{2}$" } }]
+      responses:
+        "200": { description: caller's own share of spend by category for the month, content: { application/json: { schema: { $ref: "#/components/schemas/MonthlyDashboard" } } } }
+  /export/csv:
+    get:
+      parameters: [{ name: month, in: query, required: true, schema: { type: string, pattern: "^\\d{4}-\\d{2}$" } }]
+      responses:
+        "200": { description: CSV with columns date,description,category,group,paid_by,amount_inr,my_share_inr, content: { text/csv: { schema: { type: string } } } }
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: integer } }
+  responses:
+    Error:
+      description: error
+      content: { application/json: { schema: { type: object, required: [error], properties: { error: { type: string } } } } }
+  schemas:
+    Signup:
+      type: object
+      required: [name, email, password]
+      properties: { name: { type: string }, email: { type: string, format: email }, password: { type: string, minLength: 8 } }
+    Login:
+      type: object
+      required: [email, password]
+      properties: { email: { type: string, format: email }, password: { type: string } }
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties: { token: { type: string }, user: { $ref: "#/components/schemas/User" } }
+    User:
+      type: object
+      required: [id, name, email]
+      properties: { id: { type: integer }, name: { type: string }, email: { type: string } }
+    Group:
+      type: object
+      required: [id, name, created_by]
+      properties: { id: { type: integer }, name: { type: string }, created_by: { type: integer } }
+    GroupDetail:
+      allOf:
+        - $ref: "#/components/schemas/Group"
+        - type: object
+          required: [members]
+          properties: { members: { type: array, items: { $ref: "#/components/schemas/User" } } }
+    Balance:
+      type: object
+      required: [user_id, name, net_paise]
+      properties: { user_id: { type: integer }, name: { type: string }, net_paise: { type: integer } }
+    SettleRequest:
+      type: object
+      required: [from_user, to_user, amount_paise]
+      properties: { from_user: { type: integer }, to_user: { type: integer }, amount_paise: { type: integer, minimum: 1 } }
+    Settlement:
+      type: object
+      required: [id, group_id, from_user, to_user, amount_paise, created_at]
+      properties: { id: { type: integer }, group_id: { type: integer }, from_user: { type: integer }, to_user: { type: integer }, amount_paise: { type: integer }, created_at: { type: string, format: date-time } }
+    Split:
+      type: object
+      required: [user_id, share_paise]
+      properties: { user_id: { type: integer }, share_paise: { type: integer } }
+    ExpenseCreate:
+      type: object
+      required: [amount_paise, category, description, spent_on, split_type]
+      properties:
+        group_id: { type: [integer, "null"], description: null for a personal expense }
+        paid_by: { type: integer, description: defaults to the caller }
+        amount_paise: { type: integer, minimum: 1 }
+        category: { type: string }
+        description: { type: string }
+        spent_on: { type: string, format: date }
+        split_type: { type: string, enum: [equal, exact, percent] }
+        splits:
+          type: array
+          description: for equal, list user_ids only via share_paise=0; for exact, share_paise per user; for percent, share_paise holds the percentage (0-100)
+          items: { $ref: "#/components/schemas/Split" }
+    Expense:
+      type: object
+      required: [id, group_id, paid_by, amount_paise, category, description, spent_on, split_type, splits]
+      properties:
+        id: { type: integer }
+        group_id: { type: [integer, "null"] }
+        paid_by: { type: integer }
+        amount_paise: { type: integer }
+        category: { type: string }
+        description: { type: string }
+        spent_on: { type: string, format: date }
+        split_type: { type: string, enum: [equal, exact, percent] }
+        splits: { type: array, items: { $ref: "#/components/schemas/Split" } }
+    MonthlyDashboard:
+      type: object
+      required: [month, total_paise, by_category]
+      properties:
+        month: { type: string }
+        total_paise: { type: integer }
+        by_category: { type: array, items: { type: object, required: [category, total_paise], properties: { category: { type: string }, total_paise: { type: integer } } } }

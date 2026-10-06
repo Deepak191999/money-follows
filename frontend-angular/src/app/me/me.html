@@ -1,0 +1,48 @@
+<app-nav />
+<main>
+  <h1>My expenses</h1>
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <section class="card">
+    <div class="row">
+      <label>
+        Month
+        <input type="month" name="month" [(ngModel)]="month" (ngModelChange)="loadDashboard()" />
+      </label>
+      <button type="button" [disabled]="downloading()" (click)="download()">Download CSV</button>
+    </div>
+    @if (dashboard(); as d) {
+      <p>
+        Total for {{ d.month }}: <strong>{{ d.total_paise | money }}</strong>
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th class="num">My share</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of d.by_category; track c.category) {
+            <tr>
+              <td>{{ c.category }}</td>
+              <td class="num">{{ c.total_paise | money }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+
+  <section class="card">
+    <h2>Add personal expense</h2>
+    <app-expense-form (created)="onExpenseCreated($event)" />
+  </section>
+
+  <section class="card">
+    <h2>Personal expenses</h2>
+    <app-expense-list [expenses]="expenses()" (deleted)="onExpenseDeleted($event)" />
+  </section>
+</main>

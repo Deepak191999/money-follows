@@ -1,0 +1,29 @@
+<main class="narrow">
+  <h1>Money Follows</h1>
+  <h2>{{ signup() ? 'Create an account' : 'Log in' }}</h2>
+  <form (ngSubmit)="submit()" class="stack">
+    @if (signup()) {
+      <label>
+        Name
+        <input type="text" name="name" required [(ngModel)]="name" />
+      </label>
+    }
+    <label>
+      Email
+      <input type="email" name="email" required [(ngModel)]="email" />
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" required minlength="8" [(ngModel)]="password" />
+    </label>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    <button type="submit" [disabled]="busy()">{{ signup() ? 'Sign up' : 'Log in' }}</button>
+  </form>
+  <p>
+    <button type="button" class="link" (click)="signup.set(!signup())">
+      {{ signup() ? 'Already have an account? Log in' : 'New here? Sign up' }}
+    </button>
+  </p>
+</main>

@@ -1,0 +1,37 @@
+{
+  "users": [
+    { "id": 1, "name": "Asha Rao", "email": "asha@example.com", "password": "password123" },
+    { "id": 2, "name": "Bilal Khan", "email": "bilal@example.com", "password": "password123" },
+    { "id": 3, "name": "Chetan Iyer", "email": "chetan@example.com", "password": "password123" }
+  ],
+  "groups": [
+    { "id": 1, "name": "Goa trip", "created_by": 1, "members": [1, 2, 3] },
+    { "id": 2, "name": "Flat 4B", "created_by": 2, "members": [1, 2] }
+  ],
+  "expenses": [
+    { "id": 1, "group_id": 1, "paid_by": 1, "amount_paise": 450000, "category": "Travel", "description": "Flights BLR-GOI", "spent_on": "2026-08-14", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 150000 }, { "user_id": 2, "share_paise": 150000 }, { "user_id": 3, "share_paise": 150000 }] },
+    { "id": 2, "group_id": 1, "paid_by": 2, "amount_paise": 1200000, "category": "Stay", "description": "Villa 3 nights", "spent_on": "2026-08-14", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 400000 }, { "user_id": 2, "share_paise": 400000 }, { "user_id": 3, "share_paise": 400000 }] },
+    { "id": 3, "group_id": 1, "paid_by": 3, "amount_paise": 320000, "category": "Food", "description": "Dinner at Thalassa", "spent_on": "2026-08-15", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 106667 }, { "user_id": 2, "share_paise": 106667 }, { "user_id": 3, "share_paise": 106666 }] },
+    { "id": 4, "group_id": 1, "paid_by": 1, "amount_paise": 180000, "category": "Travel", "description": "Scooter rental", "spent_on": "2026-08-15", "split_type": "exact", "splits": [{ "user_id": 1, "share_paise": 90000 }, { "user_id": 2, "share_paise": 90000 }] },
+    { "id": 5, "group_id": 1, "paid_by": 2, "amount_paise": 75000, "category": "Food", "description": "Breakfast", "spent_on": "2026-08-16", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 25000 }, { "user_id": 2, "share_paise": 25000 }, { "user_id": 3, "share_paise": 25000 }] },
+    { "id": 6, "group_id": 1, "paid_by": 3, "amount_paise": 500000, "category": "Activities", "description": "Scuba diving", "spent_on": "2026-08-16", "split_type": "percent", "splits": [{ "user_id": 1, "share_paise": 250000 }, { "user_id": 2, "share_paise": 125000 }, { "user_id": 3, "share_paise": 125000 }] },
+    { "id": 7, "group_id": 1, "paid_by": 1, "amount_paise": 60000, "category": "Travel", "description": "Cab to airport", "spent_on": "2026-08-17", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 20000 }, { "user_id": 2, "share_paise": 20000 }, { "user_id": 3, "share_paise": 20000 }] },
+    { "id": 8, "group_id": 2, "paid_by": 2, "amount_paise": 3600000, "category": "Rent", "description": "September rent", "spent_on": "2026-09-01", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 1800000 }, { "user_id": 2, "share_paise": 1800000 }] },
+    { "id": 9, "group_id": 2, "paid_by": 1, "amount_paise": 240000, "category": "Utilities", "description": "Electricity bill", "spent_on": "2026-09-05", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 120000 }, { "user_id": 2, "share_paise": 120000 }] },
+    { "id": 10, "group_id": 2, "paid_by": 1, "amount_paise": 99900, "category": "Utilities", "description": "Broadband", "spent_on": "2026-09-06", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 49950 }, { "user_id": 2, "share_paise": 49950 }] },
+    { "id": 11, "group_id": 2, "paid_by": 2, "amount_paise": 420000, "category": "Groceries", "description": "BigBasket weekly", "spent_on": "2026-09-07", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 210000 }, { "user_id": 2, "share_paise": 210000 }] },
+    { "id": 12, "group_id": 2, "paid_by": 1, "amount_paise": 150000, "category": "Household", "description": "Maid salary", "spent_on": "2026-09-10", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 75000 }, { "user_id": 2, "share_paise": 75000 }] },
+    { "id": 13, "group_id": 2, "paid_by": 2, "amount_paise": 380000, "category": "Groceries", "description": "BigBasket weekly", "spent_on": "2026-09-14", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 190000 }, { "user_id": 2, "share_paise": 190000 }] },
+    { "id": 14, "group_id": 2, "paid_by": 1, "amount_paise": 89000, "category": "Household", "description": "Gas cylinder", "spent_on": "2026-09-18", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 44500 }, { "user_id": 2, "share_paise": 44500 }] },
+    { "id": 15, "group_id": null, "paid_by": 1, "amount_paise": 25000, "category": "Food", "description": "Lunch", "spent_on": "2026-09-02", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 25000 }] },
+    { "id": 16, "group_id": null, "paid_by": 1, "amount_paise": 129900, "category": "Shopping", "description": "Running shoes", "spent_on": "2026-09-04", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 129900 }] },
+    { "id": 17, "group_id": null, "paid_by": 1, "amount_paise": 19900, "category": "Subscriptions", "description": "Spotify", "spent_on": "2026-09-08", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 19900 }] },
+    { "id": 18, "group_id": null, "paid_by": 1, "amount_paise": 45000, "category": "Transport", "description": "Metro card top-up", "spent_on": "2026-09-11", "split_type": "equal", "splits": [{ "user_id": 1, "share_paise": 45000 }] },
+    { "id": 19, "group_id": null, "paid_by": 2, "amount_paise": 65000, "category": "Food", "description": "Team dinner", "spent_on": "2026-09-12", "split_type": "equal", "splits": [{ "user_id": 2, "share_paise": 65000 }] },
+    { "id": 20, "group_id": null, "paid_by": 3, "amount_paise": 249900, "category": "Shopping", "description": "Headphones", "spent_on": "2026-09-15", "split_type": "equal", "splits": [{ "user_id": 3, "share_paise": 249900 }] }
+  ],
+  "settlements": [
+    { "id": 1, "group_id": 1, "from_user": 3, "to_user": 2, "amount_paise": 200000, "created_at": "2026-08-20T10:00:00Z" },
+    { "id": 2, "group_id": 2, "from_user": 1, "to_user": 2, "amount_paise": 1500000, "created_at": "2026-09-03T09:30:00Z" }
+  ]
+}

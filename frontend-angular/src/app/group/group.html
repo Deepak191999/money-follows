@@ -1,0 +1,118 @@
+<app-nav />
+<main>
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+  @if (group(); as g) {
+    <h1>{{ g.name }}</h1>
+    @if (g.created_by === me()?.id) {
+      <button type="button" class="link" (click)="deleteGroup()">Delete group</button>
+    }
+
+    <section class="card">
+      <h2>Members</h2>
+      <ul class="list">
+        @for (m of g.members; track m.id) {
+          <li>
+            {{ m.name }} <span class="muted">{{ m.email }}</span>
+          </li>
+        }
+      </ul>
+      <form (ngSubmit)="addMember()" class="row">
+        <label>
+          Add by email
+          <input type="email" name="memberEmail" required [(ngModel)]="memberEmail" />
+        </label>
+        <button type="submit" [disabled]="memberBusy()">Add member</button>
+      </form>
+      @if (memberError()) {
+        <p class="error">{{ memberError() }}</p>
+      }
+    </section>
+
+    <section class="card">
+      <h2>Balances</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th class="num">Net</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of balances(); track b.user_id) {
+            <tr>
+              <td>{{ b.name }}</td>
+              <td class="num" [class.positive]="b.net_paise > 0" [class.negative]="b.net_paise < 0">
+                {{ b.net_paise | money }}
+              </td>
+              <td class="muted">
+                @if (b.net_paise > 0) {
+                  is owed
+                } @else if (b.net_paise < 0) {
+                  owes
+                } @else {
+                  settled
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <h3>Settle up</h3>
+      <form (ngSubmit)="settle()" class="row">
+        <label>
+          From
+          <select name="fromUser" required [(ngModel)]="fromUser">
+            @for (m of g.members; track m.id) {
+              <option [ngValue]="m.id">{{ m.name }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          To
+          <select name="toUser" required [(ngModel)]="toUser">
+            @for (m of g.members; track m.id) {
+              <option [ngValue]="m.id">{{ m.name }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Amount (INR)
+          <input
+            type="number"
+            name="settleAmount"
+            min="0.01"
+            step="0.01"
+            required
+            [(ngModel)]="settleAmount"
+          />
+        </label>
+        <button type="submit">Settle</button>
+      </form>
+      @if (settleError()) {
+        <p class="error">{{ settleError() }}</p>
+      }
+    </section>
+
+    <section class="card">
+      <h2>Add expense</h2>
+      <app-expense-form
+        [groupId]="g.id"
+        [members]="g.members"
+        (created)="onExpenseCreated($event)"
+      />
+    </section>
+
+    <section class="card">
+      <h2>Expenses</h2>
+      <app-expense-list
+        [expenses]="expenses()"
+        [members]="g.members"
+        (deleted)="onExpenseDeleted($event)"
+      />
+    </section>
+  }
+</main>
